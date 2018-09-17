@@ -12,8 +12,8 @@ var escalate = (callPurpose, conversation_uuid) => {
     console.log("ESCALATING CALL: ", callPurpose, conversation_uuid);
 
     var conversationId = process.env.CONFERENCE_NAME + conversation_uuid;
-    //TODO: Connect SIP Leg.
 
+    //Forward to SIP Leg.
     nexmo.calls.update(conversationId, {
         action: 'transfer',
         destination: {
@@ -27,7 +27,6 @@ var escalate = (callPurpose, conversation_uuid) => {
             console.log(res);
         }
     });
-    //TODO: Disconnect IVR Leg.
 }
 
 module.exports.escalate = escalate;

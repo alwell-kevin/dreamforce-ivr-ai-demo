@@ -18,6 +18,17 @@ var conversation_uuid;
 //*******DUE TO FEATURE RESTRICTION ON DIALOGFLOW (NEED ENTERPRISE ACCOUNT ACCESS), NO SESSION_ID IS RETURNED WITH 'ACTION'. */
 //*******EACH SESSION IS MAPPED TO A SINGLE NUMBER FOR DEMO PURPOSES. */
 
+
+//********************INTENT LIST********************
+//1. Connect me to support
+//2. Connect me to sales
+//3. what is my order status?
+//4 "live agent" 
+//Who is nexmo
+//WHo is vonage
+//WHo is kevin alwell
+//what do you sell?
+
 const port = process.env.PORT || 3000;
 const app = express();
 
