@@ -16,42 +16,47 @@ const port = process.env.PORT || 3000;
 const app = express();
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({
+    extended: false
+}));
 
 app.get("/answer", (req, res) => {
     //dial out to dialogflow
     dialogflowEnabled = true
     fails = []
-    res.send([
-      {
-        "action": "talk",
-        "text": "Hello, please wait while we connect you"
-      },
-      {
-        "action": "connect",
-        "timeout": "1",
-        "from": req.query.from,
-        "endpoint": [
-          {
-            "type": "phone",
-            "number": process.env.DIALOGFLOW_NUMBER
-          }
-        ]
-      },
-      {
-        "action": "conversation",
-        "name": "test-conference",
-        "endOnExit": "true"
-      }
+    res.send([{
+            "action": "talk",
+            "text": "Hello, please wait while we connect you"
+        },
+        {
+            "action": "connect",
+            "timeout": "1",
+            "from": req.query.from,
+            "endpoint": [{
+                "type": "phone",
+                "number": process.env.DIALOGFLOW_NUMBER
+            }]
+        },
+        {
+            "action": "conversation",
+            "name": process.env.CONFERENCE_NAME,
+            "endOnExit": "true"
+        }
     ])
-  })
+})
 
-  app.post("/events", (req, res) => {
-    console.log("events", req.body);
+app.post("/event", (req, res) => {
+    console.log("In event endpoint: ", req.body);
     res.sendStatus(200)
-  })
+})
 
-  // Start server
+app.all("/google", (req, res) => {
+    console.log("In Google endpoint: ", req.body);
+
+    res.sendStatus(200)
+})
+
+// Start server
 app.listen(port, () => {
     console.log('Express server started on port ' + port);
 })
