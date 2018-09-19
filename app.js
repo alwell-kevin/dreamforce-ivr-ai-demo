@@ -41,34 +41,86 @@ app.get("/answer", (req, res) => {
     //TODO: Dynamic Lookup of customer record req.query.from in SF.
     //req.query.from;
     conversation_uuid = req.query.uuid;
-
+    var user = { order: "TV" };
+    var shipping;
+    if (user.order) {
+        shipping = "Press 1 for the status of your most recent Television studio order, press 2 for customer support, or press 3 to speak with a sales agent."
+    } else {
+        shipping = "Press 1 to speak with a sales agent, press 2 for customer support."
+    }
     //Dial out to Dialogflow
-    res.send(
-        [{
-            "action": "connect",
-            "timeout": "1",
-            "from": process.env.NEXMO_NUMBER,
-            "endpoint": [{
-                "type": "phone",
-                "number": process.env.DIALOGFLOW_NUMBER
-            }]
+    res.send([{
+            "action": "talk",
+            "text": "Hello Kevin Alwell, thank you for contacting en vision. The worlds leading high end home theater retailer. How may I direct your call?.",
+            "voiceName": "Brian",
+            "bargeIn": true
+        }, {
+            "action": "talk",
+            "text": shipping,
+            "voiceName": "Brian",
+            "bargeIn": true
         },
         {
-            "action": "conversation",
-            "name": process.env.CONFERENCE_NAME + conversation_uuid,
-            "endOnExit": "true"
+            "action": "input",
+            "eventUrl": [process.env.BASE_URL + "/ivrEvent"],
+            "maxDigits": "1",
+            'timeOut': "7"
         }
     ])
+})
+
+
+app.all("/ivrEvent", (req, res) => {
+    console.log("IN IVR: ", req.body, typeof req.body, req.body["dtmf"]);
+    var ncco;
+
+    if (req.body["dtmf"]) {
+        console.log("HAS DTMF: ", req.body["dtmf"], typeof req.body["dtmf"]);
+        if (req.body["dtmf"] === "1") {
+            console.log("TONE IS 1", req.body["dtmf"]);
+            ncco = [{
+                "action": "talk",
+                "text": "Your home theater order is set to arrive on Monday, October first. You may hangup, or press 2 to speak with customer service.",
+                "voiceName": "Brian"
+            }, {
+                "action": "input",
+                "eventUrl": [process.env.BASE_URL + "/ivrEvent"],
+                "maxDigits": "1",
+                'timeOut': "7"
+            }]
+
+        } else if (req.body["dtmf"] === "2") {
+            console.log("TONE IS 2", req.body["dtmf"])
+            ncco = [{
+                "action": "connect",
+                "from": process.env.NEXMO_NUMBER,
+                "endpoint": [{
+                    "type": "sip", //sip
+                    "number": process.env.SUPPORT_NUMBER //process.env.SALES_NUMBER
+                }]
+            }]
+        } else if (req.body["dtmf"] === "3") {
+            console.log("TONE IS 3", req.body["dtmf"])
+            ncco = [{
+                "action": "connect",
+                "from": process.env.NEXMO_NUMBER,
+                "endpoint": [{
+                    "type": "sip", //sip
+                    "number": process.env.SALES_NUMBER //process.env.SALES_NUMBER
+                }]
+            }]
+        }
+    }
+
+    console.log("RETURNING ", ncco)
+
+    res.send(ncco)
 })
 
 app.post("/event", (req, res) => {
     console.log("In event endpoint: ", req.body);
 
-    res.send([{
-        "action": "conversation",
-        "name": process.env.CONFERENCE_NAME + conversation_uuid,
-        "startOnEnter": "false",
-    }])
+    res.sendStatus(200)
 })
 
 
@@ -126,24 +178,25 @@ app.all("/contact-customer-service", (req, res) => {
         "timeout": "1",
         "from": process.env.NEXMO_NUMBER,
         "endpoint": [{
-            "type": "phone",//"sip",
-            "number": "17326157295"//process.env.SUPPORT_NUMBER
+            "type": "phone", //"sip",
+            "number": "17326157295" //process.env.SUPPORT_NUMBER
         }]
     })
 })
 
-app.all("/order-status", (req, res) => {
-    console.log("IN: contact-sales-agent")
-    res.json({
-        "action": "connect",
-        "timeout": "1",
-        "from": process.env.NEXMO_NUMBER,
-        "endpoint": [{
-            "type": "sip",
-            "number": process.env.SUPPORT_NUMBER
-        }]
-    })
-})
+//FOR SMART IVR VERSION ONLY
+// app.all("/order-status", (req, res) => {
+//     console.log("IN: contact-sales-agent")
+//     res.json({
+//         "action": "connect",
+//         "timeout": "1",
+//         "from": process.env.NEXMO_NUMBER,
+//         "endpoint": [{
+//             "type": "sip",
+//             "number": process.env.SUPPORT_NUMBER
+//         }]
+//     })
+// })
 
 // Start server
 app.listen(port, () => {
