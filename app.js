@@ -31,7 +31,7 @@ var conversation_uuid;
 
 const port = process.env.PORT || 3000;
 const app = express();
-
+var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: false
@@ -43,10 +43,11 @@ app.get("/answer", (req, res) => {
     conversation_uuid = req.query.uuid;
 
     //Dial out to Dialogflow
-    res.send([{
+    res.send(
+        [{
             "action": "connect",
             "timeout": "1",
-            "from": req.query.from,
+            "from": process.env.NEXMO_NUMBER,
             "endpoint": [{
                 "type": "phone",
                 "number": process.env.DIALOGFLOW_NUMBER
@@ -94,7 +95,7 @@ app.all("/google", (req, res) => {
     console.log("************************************")
     console.log("GOOGLE REQ: ", req.body);
     console.log("************************************")
-    
+
     //TODO:IDENTIFY DYNAMIC CONVERSATION
     //originalDetectIntentRequest: { source: 'GOOGLE_TELEPHONY', payload: { telephony: [Object] } }, <-- Need enterprise account to get this object. Otherwise, redacted.
 
@@ -106,22 +107,37 @@ app.all("/google", (req, res) => {
 
 // ACTIONS BELOW
 app.all("/contact-sales-agent", (req, res) => {
+    console.log("IN: contact-sales-agent")
     res.json({
         "action": "connect",
         "timeout": "1",
-        "from": req.query.from,
+        "from": process.env.NEXMO_NUMBER,
         "endpoint": [{
-            "type": "phone",
-            "number": process.env.SALES_NUMBER
+            "type": "phone", //sip
+            "number": "17326157295" //process.env.SALES_NUMBER
         }]
     })
 })
 
 app.all("/contact-customer-service", (req, res) => {
+    console.log("IN: customer service contact")
     res.json({
         "action": "connect",
         "timeout": "1",
-        "from": req.query.from,
+        "from": process.env.NEXMO_NUMBER,
+        "endpoint": [{
+            "type": "phone",//"sip",
+            "number": "17326157295"//process.env.SUPPORT_NUMBER
+        }]
+    })
+})
+
+app.all("/order-status", (req, res) => {
+    console.log("IN: contact-sales-agent")
+    res.json({
+        "action": "connect",
+        "timeout": "1",
+        "from": process.env.NEXMO_NUMBER,
         "endpoint": [{
             "type": "sip",
             "number": process.env.SUPPORT_NUMBER

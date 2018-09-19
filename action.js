@@ -11,10 +11,8 @@ var nexmo = new Nexmo({
 var escalate = (callPurpose, conversation_uuid) => {
     console.log("ESCALATING CALL: ", callPurpose, conversation_uuid);
 
-    var conversationId = process.env.CONFERENCE_NAME + conversation_uuid;
-
     //Forward to SIP Leg.
-    nexmo.calls.update(conversationId, {
+    nexmo.calls.update(conversation_uuid, {
         action: 'transfer',
         destination: {
             "type": "ncco",
