@@ -40,35 +40,24 @@ app.use(bodyParser.urlencoded({
 app.get("/answer", (req, res) => {
     //TODO: Dynamic Lookup of customer record req.query.from in SF.
     //req.query.from;
+    console.log("IN ANSWER: ", req.query);
     conversation_uuid = req.query.uuid;
 
-    //Dial out to Dialogflow
-    res.send(
-        [{
-            "action": "connect",
-            "timeout": "1",
-            "from": process.env.NEXMO_NUMBER,
-            "endpoint": [{
-                "type": "phone",
-                "number": process.env.DIALOGFLOW_NUMBER
-            }]
-        },
-        {
-            "action": "conversation",
-            "name": process.env.CONFERENCE_NAME + conversation_uuid,
-            "endOnExit": "true"
-        }
-    ])
+    res.send([{
+        "action": "connect",
+        "timeout": "0",
+        "from": process.env.NEXMO_NUMBER,
+        "endpoint": [{
+            "type": "phone",
+            "number": process.env.DIALOGFLOW_NUMBER
+        }]
+    }])
 })
 
 app.post("/event", (req, res) => {
     console.log("In event endpoint: ", req.body);
 
-    res.send([{
-        "action": "conversation",
-        "name": process.env.CONFERENCE_NAME + conversation_uuid,
-        "startOnEnter": "false",
-    }])
+    res.sendStatus(200)
 })
 
 
@@ -114,7 +103,7 @@ app.all("/contact-sales-agent", (req, res) => {
         "from": process.env.NEXMO_NUMBER,
         "endpoint": [{
             "type": "phone", //sip
-            "number": "17326157295" //process.env.SALES_NUMBER
+            "number": "17326157295" //URI: process.env.SALES_NUMBER
         }]
     })
 })
@@ -126,8 +115,8 @@ app.all("/contact-customer-service", (req, res) => {
         "timeout": "1",
         "from": process.env.NEXMO_NUMBER,
         "endpoint": [{
-            "type": "phone",//"sip",
-            "number": "17326157295"//process.env.SUPPORT_NUMBER
+            "type": "phone", //"sip",
+            "number": "17326157295" //URI: process.env.SUPPORT_NUMBER
         }]
     })
 })
@@ -140,7 +129,7 @@ app.all("/order-status", (req, res) => {
         "from": process.env.NEXMO_NUMBER,
         "endpoint": [{
             "type": "sip",
-            "number": process.env.SUPPORT_NUMBER
+            "uri": process.env.SUPPORT_NUMBER
         }]
     })
 })
