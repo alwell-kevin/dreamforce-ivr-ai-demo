@@ -96,7 +96,7 @@ app.all("/ivrEvent", (req, res) => {
                 "from": process.env.NEXMO_NUMBER,
                 "endpoint": [{
                     "type": "sip", //sip
-                    "number": process.env.SUPPORT_NUMBER //process.env.SALES_NUMBER
+                    "uri": "5714254597@voip.tnltd.net" //process.env.SUPPORT_NUMBER"
                 }]
             }]
         } else if (req.body["dtmf"] === "3") {
@@ -106,7 +106,7 @@ app.all("/ivrEvent", (req, res) => {
                 "from": process.env.NEXMO_NUMBER,
                 "endpoint": [{
                     "type": "sip", //sip
-                    "number": process.env.SALES_NUMBER //process.env.SALES_NUMBER
+                    "uri": "15714254595@voip.tnltd.net" //process.env.SALES_NUMBER //process.env.SALES_NUMBER
                 }]
             }]
         }
